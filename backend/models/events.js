@@ -7,7 +7,7 @@ const eventSchema = new mongoose.Schema({
         trim: true
     },
     date: {
-        type: Date,
+        type: String,
         required: true,
     },
     location: {
@@ -21,9 +21,23 @@ const eventSchema = new mongoose.Schema({
         trim: true
     },
     attendees: [{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'user'
+        userId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'user',
+            required: true
+        },
+        email: {
+            type: String,
+            required: true,
+            trim: true,
+        },
+        name: {
+            type: String,
+            required: true,
+            trim: true
+        }
     }],
+
     author: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'user',

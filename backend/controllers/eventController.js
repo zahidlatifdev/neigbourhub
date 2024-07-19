@@ -47,7 +47,7 @@ const removeEvent = async (req, res) => {
 }
 
 const updateEvent = async (req, res) => {
-    const { title, description, date, location } = req.body
+    const { title, description, date, location } = req.body.event
     const event = await Event.findById(req.params.id)
     const user = await User.findById(req.user._id)
 
@@ -86,19 +86,22 @@ const addAttendee = async (req, res) => {
     const event = await Event.findById(req.params.id)
     const invitee = await User.findOne({ email: req.body.email })
     const user = await User.findById(req.user._id)
+    const isAlreadyAttendee = event.attendees.some(attendee => attendee.userId.equals(invitee._id));
+
+    console.log()
+
     if (event) {
         if (event.author.toString() !== req.user._id.toString() && !user.isAdmin) {
             res.status(401)
             throw new Error('You are not authorized to invite attendees to this event')
-        } else if (event.attendees.includes(invitee._id)) {
-            res.status(400)
-            throw new Error('User is already an attendee')
+        } else if (isAlreadyAttendee) {
+            res.status(400).json({ message: 'User is already an attendee' });
+            return;
         } else {
-            event.attendees.push(invitee._id)
+            event.attendees.push({ userId: invitee._id, email: invitee.email, name: invitee.name })
             const updatedEvent = await event.save()
             res.json(updatedEvent)
         }
-
     } else {
         res.status(404)
         throw new Error('Event not found')
@@ -114,7 +117,7 @@ const removeAttendee = async (req, res) => {
             res.status(401)
             throw new Error('You are not authorized to remove attendees from this event')
         } else {
-            event.attendees = event.attendees.filter(attendee => attendee.toString() !== userToRemove._id.toString())
+            event.attendees = event.attendees.filter(attendee => attendee.userId.toString() !== userToRemove._id.toString())
             const updatedEvent = await event.save()
             res.json(updatedEvent)
         }

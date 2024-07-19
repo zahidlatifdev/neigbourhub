@@ -4,15 +4,14 @@ import axios from 'axios';
 export const login = createAsyncThunk('auth/login', async (data) => {
     const response = await axios.post('http://localhost:5000/api/user/login', data);
     localStorage.setItem('token', response.data.token);
-    return response.data.user;
+    return response.data;
 });
 
 export const register = createAsyncThunk('auth/register', async (data) => {
     const response = await axios.post('http://localhost:5000/api/user/register', data);
     localStorage.setItem('token', response.data.token);
-    return response.data.user;
+    return response.data;
 });
-
 
 const authSlice = createSlice({
     name: 'auth',
@@ -25,6 +24,7 @@ const authSlice = createSlice({
         logout(state) {
             state.user = null;
             localStorage.removeItem('token');
+            state.token = null;
         }
     },
     extraReducers: (builder) => {
@@ -35,6 +35,7 @@ const authSlice = createSlice({
             .addCase(login.fulfilled, (state, action) => {
                 state.status = 'fulfilled';
                 state.user = action.payload;
+                console.log(action.payload);
             })
             .addCase(login.rejected, (state, action) => {
                 state.status = 'rejected';

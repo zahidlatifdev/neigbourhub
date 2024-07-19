@@ -13,7 +13,7 @@ router.route('/profile')
     .put(protect, updateUserProfile)
 
 router.get('/checkToken', protect, (req, res) => {
-    res.json({ user: req.user, isAdmin: req.user.isAdmin });
+    res.json(req.user);
 });
 
 module.exports = router
