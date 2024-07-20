@@ -23,7 +23,12 @@ const addEvent = async (req, res) => {
         description,
         date,
         location,
-        author: req.user._id
+        author: req.user._id,
+        attendees: [{
+            userId: req.user._id,
+            email: req.user.email,
+            name: req.user.name
+        }]
     })
     const createdEvent = await event.save()
     res.status(201).json(createdEvent)
@@ -83,30 +88,38 @@ const getAttendee = async (req, res) => {
 }
 
 const addAttendee = async (req, res) => {
-    const event = await Event.findById(req.params.id)
-    const invitee = await User.findOne({ email: req.body.email })
-    const user = await User.findById(req.user._id)
-    const isAlreadyAttendee = event.attendees.some(attendee => attendee.userId.equals(invitee._id));
-
-    console.log()
-
-    if (event) {
-        if (event.author.toString() !== req.user._id.toString() && !user.isAdmin) {
-            res.status(401)
-            throw new Error('You are not authorized to invite attendees to this event')
-        } else if (isAlreadyAttendee) {
-            res.status(400).json({ message: 'User is already an attendee' });
-            return;
-        } else {
-            event.attendees.push({ userId: invitee._id, email: invitee.email, name: invitee.name })
-            const updatedEvent = await event.save()
-            res.json(updatedEvent)
+    try {
+        const event = await Event.findById(req.params.id);
+        if (!event) {
+            return res.status(404).json({ message: 'Event not found' });
         }
-    } else {
-        res.status(404)
-        throw new Error('Event not found')
+
+        const invitee = await User.findOne({ email: req.body.email });
+        if (!invitee) {
+            return res.status(404).json({ message: 'Invitee not found' });
+        }
+
+        const user = await User.findById(req.user._id);
+        const isAlreadyAttendee = event.attendees.some(attendee => attendee.email === req.body.email);
+
+        if (event.author.toString() !== req.user._id.toString() && !user.isAdmin) {
+            return res.status(401).json({ message: 'Not authorized to invite attendees' });
+        }
+
+        if (isAlreadyAttendee) {
+            return res.status(400).json({ message: 'User is already an attendee' });
+        }
+
+        event.attendees.push({ userId: invitee._id, email: invitee.email, name: invitee.name });
+        const updatedEvent = await event.save();
+
+        res.json(updatedEvent);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
     }
-}
+};
+
+
 
 const removeAttendee = async (req, res) => {
     const event = await Event.findById(req.params.id)

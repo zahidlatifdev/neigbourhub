@@ -1,4 +1,6 @@
 const User = require('../models/users')
+const Event = require('../models/events')
+const Post = require('../models/posts')
 const generateToken = require('../utils/generateToken')
 
 const getUserProfile = async (req, res) => {
@@ -32,4 +34,14 @@ const updateUserProfile = async (req, res) => {
     }
 }
 
-module.exports = { getUserProfile, updateUserProfile }
+const getEventbyUser = async (req, res) => {
+    const events = await Event.find({ author: req.user._id }).populate('author', 'username')
+    res.json(events)
+}
+
+const getPostbyUser = async (req, res) => {
+    const posts = await Post.find({ author: req.user._id }).populate('author', 'username')
+    res.json(posts)
+}
+
+module.exports = { getUserProfile, updateUserProfile, getEventbyUser, getPostbyUser }

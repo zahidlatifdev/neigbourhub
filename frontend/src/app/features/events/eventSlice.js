@@ -20,6 +20,11 @@ export const fetchEventById = createAsyncThunk("events/fetchEventById", async (i
     return response.data;
 })
 
+export const fetchUserEvents = createAsyncThunk("events/fetchUserEvents", async (userId) => {
+    const response = await axios.get(`http://localhost:5000/api/user/${userId}/events`, getAuthHeader());
+    return response.data;
+})
+
 export const createEvent = createAsyncThunk("events/createEvent", async (data) => {
     const response = await axios.post("http://localhost:5000/api/event", data, getAuthHeader());
     return response.data;
@@ -32,7 +37,7 @@ export const deleteEvent = createAsyncThunk("events/deleteEvent", async (id) => 
 
 export const updateEvent = createAsyncThunk("events/updateEvent", async (data) => {
     const response = await axios.put(`http://localhost:5000/api/event/${data.eventId}`, data, getAuthHeader());
-    
+
     return response.data;
 })
 
@@ -78,6 +83,21 @@ const eventSlice = createSlice({
             .addCase(fetchEventById.fulfilled, (state, action) => {
                 state.status = "fulfilled";
                 state.events.push(action.payload);
+            })
+            .addCase(fetchEventById.rejected, (state, action) => {
+                state.status = "rejected";
+                state.error = action.error.message;
+            })
+            .addCase(fetchUserEvents.pending, (state) => {
+                state.status = "pending";
+            })
+            .addCase(fetchUserEvents.fulfilled, (state, action) => {
+                state.status = "fulfilled";
+                state.events = action.payload;
+            })
+            .addCase(fetchUserEvents.rejected, (state, action) => {
+                state.status = "rejected";
+                state.error = action.error.message;
             })
             .addCase(createEvent.pending, (state) => {
                 state.status = "pending";

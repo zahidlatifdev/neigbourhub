@@ -24,20 +24,16 @@ const eventSchema = new mongoose.Schema({
         userId: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'user',
-            required: true
         },
         email: {
             type: String,
-            required: true,
             trim: true,
         },
         name: {
             type: String,
-            required: true,
             trim: true
         }
     }],
-
     author: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'user',

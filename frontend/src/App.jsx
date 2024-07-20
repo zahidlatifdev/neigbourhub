@@ -7,6 +7,7 @@ import Login from './components/Login';
 import Signup from './components/Signup';
 import ProtectedRoute from './components/ProtectedRoute';
 import EventDetails from './components/EventDetail';
+import EventList from './components/EventList';
 
 function App() {
 
@@ -38,6 +39,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <EventDetails />
+              </ ProtectedRoute>
+            }
+          />
+          <Route
+            path="/user/events"
+            element={
+              <ProtectedRoute>
+                <EventList />
               </ ProtectedRoute>
             }
           />

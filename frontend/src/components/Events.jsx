@@ -23,7 +23,7 @@ function Events() {
 
   useEffect(() => {
     dispatch(fetchEvents())
-  }, [dispatch, events])
+  }, [dispatch])
 
   const addToCalendar = (event) => {
     const startDate = new Date(event.date);
@@ -80,7 +80,8 @@ function Events() {
 
   const handleCardClick = (eventId) => {
     navigate(`/events/${eventId}`);
-  };
+  };  
+
 
   return (
     <div className="container mx-auto px-4 py-8">

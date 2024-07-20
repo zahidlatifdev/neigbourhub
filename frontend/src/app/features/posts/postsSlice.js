@@ -20,6 +20,11 @@ export const fetchSinglePost = createAsyncThunk("posts/fetchSinglePost", async (
     return response.data;
 })
 
+export const fetchUserPost = createAsyncThunk("posts/fetchUserPost", async (userId) => {
+    const response = await axios.get(`http://localhost:5000/api/user/${userId}/posts`, getAuthHeader());
+    return response.data;
+})
+
 export const createPost = createAsyncThunk("posts/createPost", async (data) => {
     const response = await axios.post("http://localhost:5000/api/post", data, getAuthHeader());
     return response.data;
@@ -64,6 +69,17 @@ const postsSlice = createSlice({
                 state.posts = action.payload;
             })
             .addCase(fetchSinglePost.rejected, (state, action) => {
+                state.status = "rejected";
+                state.error = action.error.message;
+            })
+            .addCase(fetchUserPost.pending, (state) => {
+                state.status = "pending";
+            })
+            .addCase(fetchUserPost.fulfilled, (state, action) => {
+                state.status = "fulfilled";
+                state.posts = action.payload;
+            })
+            .addCase(fetchUserPost.rejected, (state, action) => {
                 state.status = "rejected";
                 state.error = action.error.message;
             })
